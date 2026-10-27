@@ -9,36 +9,23 @@ tambah pelengkap, lalu checkout dan lihat ringkasan beserta total harganya.
 
 1. Buat project Flutter baru: `flutter create form_pemesanan`
 2. **Ganti** folder `lib/` di project itu dengan folder `lib/` dari repo ini.
+   (Folder `docs/` isinya gambar untuk README saja, boleh disalin biar gambarnya muncul.)
 3. Jalankan `flutter run`.
 
 ---
 
 ## 2. Struktur folder
 
-```
-lib/
-├── main.dart                  → pintu masuk aplikasi
-├── app.dart                   → MaterialApp: tema + halaman awal
-│
-├── constants/
-│   └── app_colors.dart        → kumpulan warna
-│
-├── data/
-│   └── menu_data.dart         → daftar menu & harga
-│
-├── models/
-│   └── pesanan.dart           → class Pesanan (bungkus data satu pesanan)
-│
-├── utils/
-│   └── format_rupiah.dart     → fungsi bantu format "Rp15.000"
-│
-├── screens/
-│   └── form_pemesanan_screen.dart  → halaman form (UI + logika halaman)
-│
-└── widgets/
-    ├── section_title.dart     → judul tiap bagian form
-    └── checkout_dialog.dart   → dialog ringkasan pesanan
-```
+Begini tampilannya kalau dibuka di **Visual Studio Code** (panel *Explorer* di sebelah kiri).
+Tulisan di sebelah kanan adalah penjelasan tiap folder/file:
+
+![Struktur folder di Visual Studio Code](docs/struktur_folder_vscode.png)
+
+Cara membacanya:
+
+- Folder `android`, `ios`, `test`, dan file `pubspec.yaml` dibuat otomatis oleh Flutter. Pemula tidak perlu mengubahnya.
+- Semua kode yang kita tulis ada di dalam `lib/`.
+- Di dalam `lib/`, **folder ditaruh di atas, file di bawah** (urutan bawaan VS Code). Jadi `app.dart` dan `main.dart` ada di paling bawah.
 
 ---
 
@@ -83,19 +70,32 @@ lebih rapi dipisah (`SectionTitle`, `CheckoutDialog`).
 
 ## 4. Alur kerja aplikasi
 
-```
-main()  →  MyApp (app.dart)  →  FormPemesananScreen
-                                      │
-              user mengisi form, tekan "Checkout"
-                                      │
-                         _checkout() memvalidasi input
-                                      │
-                    buat objek Pesanan dari input user
-                                      │
-                       tampilkan CheckoutDialog(pesanan)
-                                      │
-                    user tekan "Konfirmasi" → SnackBar sukses
-```
+Ikuti panah dari atas ke bawah. Angka di tiap kotak sesuai dengan tabel di bawah gambar.
+
+![Alur kerja aplikasi](docs/alur_aplikasi.png)
+
+Warna kotak:
+- 🟩 hijau: awal / akhir alur
+- 🟪 pink: proses biasa
+- 🟨 kuning: percabangan (ada pilihan Ya/Tidak)
+- 🟥 merah / abu-abu: jalur balik ke form
+
+| No | Kejadian | File yang terlibat |
+|---|---|---|
+| 1 | Aplikasi dijalankan, `runApp()` memanggil `MyApp` | `main.dart` |
+| 2 | `MyApp` mengatur tema dan menentukan halaman pertama | `app.dart` |
+| 3 | Halaman form tampil | `screens/form_pemesanan_screen.dart` |
+| 4 | User mengisi form. Tiap perubahan memanggil `setState()` | `screens/form_pemesanan_screen.dart` |
+| 5 | User menekan **Checkout**, method `_checkout()` jalan | `screens/form_pemesanan_screen.dart` |
+| 6 | Validasi: nama harus terisi, jenis kelamin dan menu harus dipilih. Kalau gagal, muncul SnackBar lalu user balik ke langkah 4 | `screens/form_pemesanan_screen.dart` |
+| 7 | Input dibungkus jadi objek `Pesanan`, total harga dihitung | `models/pesanan.dart`, `data/menu_data.dart` |
+| 8 | Dialog ringkasan tampil, harga diformat jadi `Rp...` | `widgets/checkout_dialog.dart`, `utils/format_rupiah.dart` |
+| 9 | User memilih **Kembali** (balik ke form) atau **Konfirmasi** | `widgets/checkout_dialog.dart` |
+| 10 | Kalau konfirmasi, SnackBar "Pesanan berhasil dikirim!" muncul | `screens/form_pemesanan_screen.dart` |
+
+Perhatikan bahwa **tiap langkah ditangani file yang berbeda**. Itulah gunanya
+folder dipisah: kalau ada bug di perhitungan harga, langsung buka
+`models/pesanan.dart`; kalau tampilannya yang aneh, buka `screens/` atau `widgets/`.
 
 ---
 
